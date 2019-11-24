@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:text-align="http://www.w3.org/1999/xhtml">
+<head lang="en-US">
+    <title>Hymn Service</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+</head>
+<body ng-app="HymnApp" ng-controller="HymnCtrl">
+Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
+<div ng-hide="hideTheSearchTool">
+    <div>
+        <hr/>
+        <p>Please input ids of the hymn of each book and hit "Ok":</p>
+        <li ng-repeat="bookName in bookNames">
+            {{bookName}}: <input type="text" ng-model="selectedBookToHymns[bookName]" placeholder="Enter hymn ids here">
+        </li>
+        <button ng-click="submitSelectedHymns()">Ok</button>
+        <!--<hr/>-->
+        <!--<p>selectedBookToHymns: {{selectedBookToHymns | json}}</p>-->
+        <!--<p>selectedHymnList: {{selectedHymnList}}</p>-->
+    </div>
+    <div>
+        <hr/>
+
+        <!--TODO: update this section like this one (https://embed.plnkr.co/plunk/6CNlsa)-->
+        <label>HymnBook:&nbsp;&nbsp;</label>
+        <input type="text" ng-model="selectedBook" list="hymnBookList">
+        <datalist id="hymnBookList">
+            <option value=''>-- select a book --</option>
+            <option ng-repeat="bookName in bookNames | filter:selectedBook" value="{{bookName}}"></option>
+        </datalist>
+
+        <label>Hymn:&nbsp;&nbsp;</label>
+        <input type="text" ng-model="selectedHymn" list="hymnList">
+        <datalist id="hymnList">
+            <option value=''>-- select a hymn --</option>
+            <option ng-repeat="hymnName in hymnNames | filter:selectedHymn" value="{{hymnName}}"></option>
+        </datalist>
+        <!--<select ng-model="selectedBook" ng-options="bookName for bookName in bookNames"></select>-->
+        <!--<select ng-model="selectedHymn" ng-options="hymnIdAndTitle.name for hymnIdAndTitle in hymnNames | filter:searchText"></select>-->
+
+        <div  style="text-align:center;">
+            <p>{{hymn.title}}</p>
+            <p style="white-space: pre-line;"><span>{{hymn.body}}</span></p>
+        </div>
+        <hr/>
+        <p>error: {{error}}</p>
+    </div>
+    <div>
+        <hr/>
+        <p>Selected hymns:</p>
+        <table>
+            <tr ng-repeat="hymn in selectedHymnList">
+                <td>{{hymn}}</td>
+                <td>
+                    <button ng-click="moveUp($index, $first)">move up</button>
+                </td>
+                <td>
+                    <button ng-click="moveDown($index, $last)">move down</button>
+                </td>
+                <td>
+                    <button ng-click="removeSelectedHymn($index)">delete</button>
+                </td>
+            </tr>
+        </table>
+        <button ng-click="buildHymnResult()">Go</button>
+    </div>
+</div>
+<div>
+    <hr/>
+    <p>Results:</p>
+</div>
+<script src="hymn.js"></script>
+</body>
+</html>
