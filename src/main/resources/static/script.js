@@ -1,4 +1,11 @@
 var app = angular.module('HymnApp', []);
+
+app.filter('replaceChar', function() {
+                            return function(x) {
+                              return x.replace('$', ' ')
+                            };
+                          });
+
 app.controller('HymnCtrl', function($scope, $http) {
   $scope.hideTheSearchTool=false
   $http.get("/bookNames")
@@ -36,11 +43,35 @@ app.controller('HymnCtrl', function($scope, $http) {
   });
 
   $scope.selectedHymnList = []
+  $scope.selectedBookAndHymnList = []
+
+  var hymnIdsToHymnNames = function (hymnIdList) {
+      $scope.selectedBookAndHymnList = []
+      angular.forEach($scope.selectedHymnList, function(value){
+        let nameAndId = value.split('$')
+        let bookName = nameAndId[0]
+        let id = nameAndId[1]
+        let req = {
+          method: 'GET',
+          url: '/bookNameAndHymnIdToName',
+          params: {bookName: bookName, hymnId: id}
+        }
+        $http(req)
+        .then(function(response) {
+          $scope.selectedBookAndHymnList.push([bookName, response.data[0]]);
+        }, function(response) {
+          $scope.error = response.statusText;
+        });
+      })
+    }
+
   $scope.submitSelectedHymns = function() {
     let newList = []
     angular.forEach($scope.selectedBookToHymns, function(value, key) {
+      $scope.selectedBookToHymns[key] = value.replace(' ', '')
       let ids = value.split(',')
       angular.forEach(ids, function(id){
+        id = Number(id).toString()
         if (id) {
           newList.push(key+'$'+id)
         }
@@ -56,12 +87,13 @@ app.controller('HymnCtrl', function($scope, $http) {
         $scope.selectedHymnList.push(value)
       }
     })
+    hymnIdsToHymnNames()
   }
 
   var move = function (origin, destination) {
-    let temp = $scope.selectedHymnList[destination];
-    $scope.selectedHymnList[destination] = $scope.selectedHymnList[origin];
-    $scope.selectedHymnList[origin] = temp;
+    let temp = $scope.selectedBookAndHymnList[destination];
+    $scope.selectedBookAndHymnList[destination] = $scope.selectedBookAndHymnList[origin];
+    $scope.selectedBookAndHymnList[origin] = temp;
   };
 
   $scope.moveUp = function (index, first) {
@@ -77,18 +109,26 @@ app.controller('HymnCtrl', function($scope, $http) {
   };
 
   $scope.removeSelectedHymn = function(index) {
-    let deletedHymn = $scope.selectedHymnList[index]
+    let deletedHymn = $scope.selectedBookAndHymnList[index]
     // remove the hymn from selectedBookToHymns map
-    let nameAndId = deletedHymn.split('$')
-    let bookName = nameAndId[0]
-    let id = nameAndId[1]
+    let bookName = deletedHymn[0]
+    let id = deletedHymn[1].split(' ')[0]
     let idsString = $scope.selectedBookToHymns[bookName]
     let ids = idsString.split(',')
     ids.splice(ids.indexOf(id), 1)
     $scope.selectedBookToHymns[bookName] = ids.join(',')
-    // remove the hymn from selectedHymnList
-    $scope.selectedHymnList.splice(index, 1)
+    // remove the hymn from selectedBookAndHymnList
+    $scope.selectedBookAndHymnList.splice(index, 1)
   }
+
+  $scope.selectBook = function(bookName) {
+    $scope.selectedBook = bookName;
+  }
+
+  $scope.selectHymn = function(hymnName) {
+    $scope.selectedHymn = hymnName;
+  }
+
 
 //  $scope.$watch('selectedBookToHymns', function (newVal, oldVal) {
 //    $scope.test = "test"

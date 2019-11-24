@@ -1,13 +1,82 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:text-align="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head lang="en-US">
     <title>Hymn Service</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+
+    <script data-require="jquery@*" data-semver="2.1.1"
+            src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script data-require="bootstrap@*" data-semver="3.2.0"
+            src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.js"></script>
+    <script data-require="angular.js@*" data-semver="1.3.0" src="//code.angularjs.org/1.3.0/angular.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+    <script src="script.js"></script>
+
+    <link data-require="bootstrap@*" data-semver="3.2.0" rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css"/>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body ng-app="HymnApp" ng-controller="HymnCtrl">
 Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
 <div ng-hide="hideTheSearchTool">
+    <div>
+        <hr/>
+        <div class="dropdown dropdown-scroll">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A HymnBook <span
+                    class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <li role="presentation">
+                    <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
+                            class="glyphicon glyphicon-search"></span></span>
+                        <input type="text" class="form-control" placeholder="Query" ng-model="queryBook">
+                    </div>
+                </li>
+                <li role="presentation" ng-repeat='bookName in bookNames | filter:queryBook'>
+                    <a href="#" ng-click="selectBook(bookName);"> {{bookName}} </a>
+                </li>
+            </ul>
+            <label>HymnBook:&nbsp;&nbsp;{{selectedBook}}</label>
+        </div>
+        <div class="dropdown dropdown-scroll">
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A Hymn <span
+                    class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                <li role="presentation">
+                    <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
+                            class="glyphicon glyphicon-search"></span></span>
+                        <input type="text" class="form-control" placeholder="Query" ng-model="queryHymn">
+                    </div>
+                </li>
+                <li role="presentation" ng-repeat='hymnName in hymnNames | filter:queryHymn'>
+                    <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName}} </a>
+                </li>
+            </ul>
+            <label>Hymn:&nbsp;&nbsp;{{selectedHymn}}</label>
+        </div>
+
+        <!--<label>HymnBook:&nbsp;&nbsp;</label>-->
+        <!--<input type="text" ng-model="selectedBook" list="hymnBookList">-->
+        <!--<datalist id="hymnBookList">-->
+        <!--<option value=''>&#45;&#45; select a book &#45;&#45;</option>-->
+        <!--<option ng-repeat="bookName in bookNames | filter:selectedBook" value="{{bookName}}"></option>-->
+        <!--</datalist>-->
+
+        <!--<label>Hymn:&nbsp;&nbsp;</label>-->
+        <!--<input type="text" ng-model="selectedHymn" list="hymnList">-->
+        <!--<datalist id="hymnList">-->
+        <!--<option value=''>&#45;&#45; select a hymn &#45;&#45;</option>-->
+        <!--<option ng-repeat="hymnName in hymnNames | filter:selectedHymn" value="{{hymnName}}"></option>-->
+        <!--</datalist>-->
+        <!--<select ng-model="selectedBook" ng-options="bookName for bookName in bookNames"></select>-->
+        <!--<select ng-model="selectedHymn" ng-options="hymnIdAndTitle.name for hymnIdAndTitle in hymnNames | filter:searchText"></select>-->
+
+        <div style="text-align:center;">
+            <p>{{hymn.title}}</p>
+            <p style="white-space: pre-line;"><span>{{hymn.body}}</span></p>
+        </div>
+    </div>
     <div>
         <hr/>
         <p>Please input ids of the hymn of each book and hit "Ok":</p>
@@ -21,45 +90,18 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
     </div>
     <div>
         <hr/>
-
-        <!--TODO: update this section like this one (https://embed.plnkr.co/plunk/6CNlsa)-->
-        <label>HymnBook:&nbsp;&nbsp;</label>
-        <input type="text" ng-model="selectedBook" list="hymnBookList">
-        <datalist id="hymnBookList">
-            <option value=''>-- select a book --</option>
-            <option ng-repeat="bookName in bookNames | filter:selectedBook" value="{{bookName}}"></option>
-        </datalist>
-
-        <label>Hymn:&nbsp;&nbsp;</label>
-        <input type="text" ng-model="selectedHymn" list="hymnList">
-        <datalist id="hymnList">
-            <option value=''>-- select a hymn --</option>
-            <option ng-repeat="hymnName in hymnNames | filter:selectedHymn" value="{{hymnName}}"></option>
-        </datalist>
-        <!--<select ng-model="selectedBook" ng-options="bookName for bookName in bookNames"></select>-->
-        <!--<select ng-model="selectedHymn" ng-options="hymnIdAndTitle.name for hymnIdAndTitle in hymnNames | filter:searchText"></select>-->
-
-        <div  style="text-align:center;">
-            <p>{{hymn.title}}</p>
-            <p style="white-space: pre-line;"><span>{{hymn.body}}</span></p>
-        </div>
-        <hr/>
-        <p>error: {{error}}</p>
-    </div>
-    <div>
-        <hr/>
         <p>Selected hymns:</p>
         <table>
-            <tr ng-repeat="hymn in selectedHymnList">
-                <td>{{hymn}}</td>
+            <tr ng-repeat="hymn in selectedBookAndHymnList">
+                <td>{{hymn[0]}}&nbsp;&nbsp;{{hymn[1]}}&nbsp;&nbsp;</td>
                 <td>
-                    <button ng-click="moveUp($index, $first)">move up</button>
+                    <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
                 </td>
                 <td>
-                    <button ng-click="moveDown($index, $last)">move down</button>
+                    <button class="glyphicon glyphicon-arrow-down" ng-click="moveDown($index, $last)"></button>
                 </td>
                 <td>
-                    <button ng-click="removeSelectedHymn($index)">delete</button>
+                    <button class="glyphicon glyphicon-remove" ng-click="removeSelectedHymn($index)"></button>
                 </td>
             </tr>
         </table>
@@ -69,7 +111,13 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
 <div>
     <hr/>
     <p>Results:</p>
+    <p>error: {{error}}</p>
 </div>
-<script src="hymn.js"></script>
+<!--<script src="hymn.js"></script>-->
+<script>
+    $('.dropdown-menu').find('input').click(function (e) {
+      e.stopPropagation();
+    });
+</script>
 </body>
 </html>
