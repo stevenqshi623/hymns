@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+    <title>Hymns</title>
+    <link rel='stylesheet' href='reveal/css/reset.css'>
+    <link rel='stylesheet' href='reveal/css/reveal.css'>
+    <link rel='stylesheet' href='reveal/css/theme/white.css'>
+    <link rel='stylesheet' href='reveal/lib/css/monokai.css'>
+    <script>
+		var link = document.createElement('link');
+		link.rel = 'stylesheet';
+		link.type = 'text/css';
+		link.href = window.location.search.match(/print-pdf/gi) ? 'reveal/css/print/pdf.css' : 'reveal/css/print/paper.css';
+		document.getElementsByTagName('head')[0].appendChild(link);
+    </script>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js'></script>
+    <script src='script.js'></script>
+</head>
+<body ng-app='HymnApp' ng-controller='HymnCtrl'>
+<div class='reveal'>
+    <div class='slides'>
+        <section data-markdown data-background-image='background.jpg' data-background-size='100% 100%'>
+            <textarea data-template>
+                # 祂是主
+	        </textarea>
+        </section>
+        <section data-markdown data-background-image='background.jpg' data-background-size='100% 100%'>
+	        <textarea data-template>
+                ## 祂是主，祂是主，
+                ## 祂是勝過死亡又復活的主；
+                ## 萬膝當跪拜，萬口當承認，
+                ## 耶穌基督是主。
+	        </textarea>
+        </section>
+    </div>
+</div>
+<script src='reveal/js/reveal.js'></script>
+<script>
+			Reveal.initialize({
+				width: '100%',
+	            height: '100%',
+	            margin: 0,
+	            minScale: 1,
+	            maxScale: 1,
+				dependencies: [
+					{ src: 'reveal/plugin/markdown/marked.js' },
+					{ src: 'reveal/plugin/markdown/markdown.js' },
+					{ src: 'reveal/plugin/notes/notes.js', async: true },
+					{ src: 'reveal/plugin/highlight/highlight.js', async: true }
+				]
+			});
+</script>
+</body>
+</html>
