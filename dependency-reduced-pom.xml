@@ -42,7 +42,7 @@
                 </transformer>
                 <transformer />
                 <transformer>
-                  <mainClass>com.christian.suffolk.Main</mainClass>
+                  <mainClass>com.christian.suffolk.HymnService</mainClass>
                 </transformer>
               </transformers>
             </configuration>

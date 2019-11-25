@@ -90,7 +90,7 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
         <hr/>
         <p>Please input ids of the hymns of each book and hit "Ok":</p>
         <ul ng-repeat="bookName in bookNames">
-            {{bookName}}: <input type="text" ng-model="selectedBookToHymns[bookName]" placeholder="Enter hymn ids here">
+            {{bookName}}: <input type="text" ng-model="bookToHymnIds[bookName]" placeholder="Enter hymn ids here">
         </ul>
         <button ng-click="submitSelectedHymns()">Ok</button>
     </div>
@@ -98,8 +98,8 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
         <hr/>
         <p>Please adjust the order of the selected hymns and hit "Go":</p>
         <table>
-            <tr ng-repeat="hymn in selectedHymnList">
-                <td>{{selectedBookAndHymnList[hymn][0]}}&nbsp;&nbsp;{{selectedBookAndHymnList[hymn][1]}}&nbsp;&nbsp;</td>
+            <tr ng-repeat="bookAndHymnId in bookAndHymnIds">
+                <td>{{hymnIdsToHymnNames[bookAndHymnId][0]}}&nbsp;&nbsp;{{hymnIdsToHymnNames[bookAndHymnId][1]}}&nbsp;&nbsp;</td>
                 <td>
                     <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
                 </td>
@@ -115,11 +115,11 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
     </div>
 </div>
 <div>
-    <ul ng-repeat="hymn in selectedHymnList">
+    <ul ng-repeat="bookAndHymnId in bookAndHymnIds">
         <hr/>
         <div class="hymn-whole">
-            <p class="hymn-title">{{hymnResults[hymn].title}}</p>
-            <p class="hymn-body"><span>{{hymnResults[hymn].body}}</span></p>
+            <p class="hymn-title">{{hymnResults[bookAndHymnId].title}}</p>
+            <p class="hymn-body"><span>{{hymnResults[bookAndHymnId].body}}</span></p>
         </div>
     </ul>
 </div>

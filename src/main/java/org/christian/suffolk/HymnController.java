@@ -40,7 +40,6 @@ public class HymnController {
     @RequestMapping("/hymn")
     public String getHymn(@RequestParam(value = "bookName") String bookName, @RequestParam(value = "hymnName") String hymnName) throws IOException {
         String fileName = hymnLibraryName + "/" + bookName + "/" + hymnName + "/Hymn.json";
-        System.out.println("fileName: " + fileName);
         String hymnFile = classLoader.getResource(fileName).getFile();
         hymnFile = java.net.URLDecoder.decode(hymnFile, "utf-8");
         BufferedReader br = new BufferedReader(new FileReader(new File(hymnFile)));
