@@ -5,9 +5,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +27,7 @@ public class HymnController {
     @RequestMapping("/hymnNames")
     public List<String> getHymnNames(@RequestParam(value = "bookName") String bookName) throws UnsupportedEncodingException {
         String hymnBookName = classLoader.getResource(hymnLibraryName + "/" + bookName).getFile();
-        hymnBookName =  java.net.URLDecoder.decode(hymnBookName,"utf-8");
+        hymnBookName = java.net.URLDecoder.decode(hymnBookName, "utf-8");
         File hymnBookFile = new File(hymnBookName);
         List<String> hymnNames = new ArrayList<>();
         String[] hymnNameList = hymnBookFile.list();
@@ -44,8 +41,7 @@ public class HymnController {
     public String getHymnsOfBook(@RequestParam(value = "bookName") String bookName, @RequestParam(value = "hymnName") String hymnName) throws IOException {
         String fileName = hymnLibraryName + "/" + bookName + "/" + hymnName + "/Chinese.json";
         String hymnFile = classLoader.getResource(fileName).getFile();
-        hymnFile =  java.net.URLDecoder.decode(hymnFile,"utf-8");
-
+        hymnFile = java.net.URLDecoder.decode(hymnFile, "utf-8");
         BufferedReader br = new BufferedReader(new FileReader(new File(hymnFile)));
         String st;
         StringBuilder sb = new StringBuilder();
@@ -57,19 +53,15 @@ public class HymnController {
 
     @RequestMapping("/bookNameAndHymnIdToName")
     public List<String> getHymnNameWithBookNameAndHymnId(@RequestParam(value = "bookName") String bookName, @RequestParam(value = "hymnId") String hymnId) throws UnsupportedEncodingException {
-        System.out.println("bookName: " + bookName);
-        System.out.println("hymnId: " + hymnId);
         List<String> hymnNames = getHymnNames(bookName);
         String hymnPrefix = hymnId + ' ';
         List<String> result = new ArrayList<>();
         for (String hymnName : hymnNames) {
             if (hymnName.startsWith(hymnPrefix)) {
-                System.out.println("hymnName: " + hymnName);
                 result.add(hymnName);
                 return result;
             }
         }
         return result;
     }
-
 }

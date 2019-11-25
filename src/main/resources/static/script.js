@@ -43,8 +43,6 @@ app.controller('HymnCtrl', function($scope, $http) {
   });
 
   $scope.selectedHymnList = []
-  $scope.selectedBookAndHymnList = []
-
   var hymnIdsToHymnNames = function (hymnIdList) {
       $scope.selectedBookAndHymnList = []
       angular.forEach($scope.selectedHymnList, function(value){
@@ -129,7 +127,20 @@ app.controller('HymnCtrl', function($scope, $http) {
     $scope.selectedHymn = hymnName;
   }
 
-
+  $scope.buildHymnResult = function() {
+    $scope.hymnResults = []
+    angular.forEach($scope.selectedBookAndHymnList, function(value){
+      var req = {
+        method: 'GET',
+        url: 'http://localhost:7777/hymn',
+        params: {bookName: value[0], hymnName: value[1]}
+      }
+      $http(req)
+      .then(function(response) {
+        $scope.hymnResults.push(response.data);
+      });
+    })
+  }
 //  $scope.$watch('selectedBookToHymns', function (newVal, oldVal) {
 //    $scope.test = "test"
 //  });
