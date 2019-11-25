@@ -10,9 +10,14 @@
   <groupId>org.christian.suffolk</groupId>
   <artifactId>hymns</artifactId>
   <name>hymns</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <url>http://maven.apache.org</url>
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -42,7 +47,7 @@
                 </transformer>
                 <transformer />
                 <transformer>
-                  <mainClass>com.christian.suffolk.HymnService</mainClass>
+                  <mainClass>org.christian.suffolk.HymnService</mainClass>
                 </transformer>
               </transformers>
             </configuration>

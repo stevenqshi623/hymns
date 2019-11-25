@@ -26,7 +26,7 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     if ($scope.selectedHymn) {
       var req = {
         method: 'GET',
-        url: 'http://localhost:7777/hymn',
+        url: '/hymn',
         params: {bookName: $scope.selectedBook, hymnName: $scope.selectedHymn}
       }
       $http(req)
@@ -130,7 +130,7 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
 //      $window.alert(value)
       var req = {
         method: 'GET',
-        url: 'http://localhost:7777/hymn',
+        url: '/hymn',
         params: {bookName: value[0], hymnName: value[1]}
       }
       $http(req)
