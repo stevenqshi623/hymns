@@ -98,8 +98,8 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
         <hr/>
         <p>Please adjust the order of the selected hymns and hit "Go":</p>
         <table>
-            <tr ng-repeat="hymn in selectedBookAndHymnList" style="height: 200%;">
-                <td>{{hymn[0]}}&nbsp;&nbsp;{{hymn[1]}}&nbsp;&nbsp;</td>
+            <tr ng-repeat="hymn in selectedHymnList">
+                <td>{{selectedBookAndHymnList[hymn][0]}}&nbsp;&nbsp;{{selectedBookAndHymnList[hymn][1]}}&nbsp;&nbsp;</td>
                 <td>
                     <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
                 </td>
@@ -115,11 +115,11 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
     </div>
 </div>
 <div>
-    <ul ng-repeat="hymnResult in hymnResults">
+    <ul ng-repeat="hymn in selectedHymnList">
         <hr/>
         <div class="hymn-whole">
-            <p class="hymn-title">{{hymnResult.title}}</p>
-            <p class="hymn-body"><span>{{hymnResult.body}}</span></p>
+            <p class="hymn-title">{{hymnResults[hymn].title}}</p>
+            <p class="hymn-body"><span>{{hymnResults[hymn].body}}</span></p>
         </div>
     </ul>
 </div>
