@@ -6,3 +6,27 @@
 .search-control {
     padding: 5px 10px;
 }
+.hymn-whole {
+    text-align: center;
+}
+.hymn-title {
+    font-style: Sans-serif;
+    font-size: 40px;
+    font-weight: bold;
+}
+.hymn-body {
+    font-style: Sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    white-space: pre-line;
+}
+
+label {
+    width: 150px;
+}
+
+.instruction {
+    font-style: Sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+}

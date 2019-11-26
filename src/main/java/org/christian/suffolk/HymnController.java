@@ -1,7 +1,8 @@
 package org.christian.suffolk;
 
 
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.apache.poi.xslf.usermodel.XSLFPictureData;
+import org.json.JSONObject;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,8 @@ import java.util.jar.JarFile;
 @RestController
 public class HymnController {
     private final String hymnLibraryName = "HymnLibrary";
-    private ClassLoader classLoader = getClass().getClassLoader();
+    private final ClassLoader classLoader = getClass().getClassLoader();
+    private XSLFPictureData pd = null;
 
     @RequestMapping("/bookNames")
     public List<String> getBookNames() throws IOException, URISyntaxException {
@@ -25,14 +27,13 @@ public class HymnController {
         List<String> bookNames = new ArrayList<>();
         if (dirURL.getProtocol().equals("file")) {
             bookNames = Arrays.asList(new File(dirURL.toURI()).list());
-        }
-        else {
+        } else {
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
             JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
             Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
             Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
             String dirName = hymnLibraryName + "/";
-            while(entries.hasMoreElements()) {
+            while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
                 if (name.startsWith(dirName)) { //filter according to the path
                     String entry = name.substring(dirName.length());
@@ -54,17 +55,16 @@ public class HymnController {
     public List<String> getHymnNames(@RequestParam(value = "bookName") String bookName) throws IOException, URISyntaxException {
         String hymnBookName = hymnLibraryName + "/" + bookName;
         URL dirURL = classLoader.getResource(hymnBookName);
-        List<String> hymnNames = new ArrayList<>();
+        List<String> hymnNames;
         if (dirURL.getProtocol().equals("file")) {
             hymnNames = Arrays.asList(new File(dirURL.toURI()).list());
-        }
-        else {
+        } else {
             String jarPath = dirURL.getPath().substring(5, dirURL.getPath().indexOf("!")); //strip out only the JAR file
             JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
             Enumeration<JarEntry> entries = jar.entries(); //gives ALL entries in jar
             Set<String> result = new HashSet<>(); //avoid duplicates in case it is a subdirectory
             String dirName = hymnBookName + "/";
-            while(entries.hasMoreElements()) {
+            while (entries.hasMoreElements()) {
                 String name = entries.nextElement().getName();
                 if (name.startsWith(dirName)) { //filter according to the path
                     String entry = name.substring(dirName.length());
@@ -85,7 +85,6 @@ public class HymnController {
     @RequestMapping("/hymn")
     public String getHymn(@RequestParam(value = "bookName") String bookName, @RequestParam(value = "hymnName") String hymnName) throws IOException {
         String fileName = hymnLibraryName + "/" + bookName + "/" + hymnName + "/Hymn.json";
-        System.out.println("fileName: " + fileName);
         InputStream in = classLoader.getResourceAsStream(fileName);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
@@ -108,5 +107,26 @@ public class HymnController {
             }
         }
         return result;
+    }
+
+    @RequestMapping("/getPowerPoint")
+    public byte[] getPowerPoint(@RequestParam(value = "bookAndHymnIds") List<String> bookAndHymnIds) throws IOException, URISyntaxException {
+        PowerPoint ppt = new PowerPoint();
+        for (String bookAndHymnId : bookAndHymnIds) {
+            insertHymnIntoPowerPoint(bookAndHymnId, ppt);
+        }
+        // ppt.outputPowerPoint();
+        return ppt.getPowerPoint();
+    }
+
+    private void insertHymnIntoPowerPoint(String bookAndHymnId, PowerPoint ppt) throws IOException, URISyntaxException {
+        String[] bookNameAndHymnId = bookAndHymnId.split("\\$");
+        String hymnName = getHymnNameWithBookNameAndHymnId(bookNameAndHymnId[0], bookNameAndHymnId[1]).get(0);
+        String hymnJson = getHymn(bookNameAndHymnId[0], hymnName);
+        JSONObject hymnObj = new JSONObject(hymnJson);
+        String titleText = hymnObj.getString("title");
+        String bodyText = hymnObj.getString("body");
+        ppt.insertTitlePage(titleText);
+        ppt.insertBodyPages(bodyText);
     }
 }

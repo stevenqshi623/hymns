@@ -139,4 +139,22 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
       });
     })
   }
+
+  $scope.buildPowerPoint = function() {
+    var req = {
+      method: 'GET',
+      url: '/getPowerPoint',
+      params: {bookAndHymnIds: $scope.bookAndHymnIds},
+      responseType: 'arraybuffer'
+    }
+    $http(req)
+    .then(function(response) {
+      let blob = new Blob([response.data])
+      let a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([response.data]));
+//      a.download = "Hymns-" + Date.now() +".pptx";
+      a.download = "Hymns.pptx";
+      a.click();
+    });
+  }
 });

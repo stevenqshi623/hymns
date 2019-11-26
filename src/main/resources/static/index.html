@@ -14,41 +14,14 @@
 
     <link data-require="bootstrap@*" data-semver="3.2.0" rel="stylesheet"
           href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.css"/>
-    <!--<link rel="stylesheet" href="style.css">-->
-    <style>
-        .dropdown.dropdown-scroll .dropdown-menu {
-            max-height: 200px;
-            width: 60px;
-            overflow: auto;
-        }
-        .search-control {
-            padding: 5px 10px;
-        }
-        .hymn-whole {
-            text-align: center;
-        }
-        .hymn-title {
-            font-style: Sans-serif;
-            font-size: 40px;
-            font-weight: bold;
-        }
-
-        .hymn-body {
-            font-style: Sans-serif;
-            font-size: 30px;
-            font-weight: bold;
-            white-space: pre-line;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body ng-app="HymnApp" ng-controller="HymnCtrl">
-Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
-<div ng-hide="hideTheSearchTool">
+<div>
     <div>
-        <hr/>
         <div class="dropdown dropdown-scroll">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A HymnBook <span
-                    class="caret"></span>
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A HymnBook
+                <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                 <li role="presentation">
@@ -61,11 +34,10 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
                     <a href="#" ng-click="selectBook(bookName);"> {{bookName}} </a>
                 </li>
             </ul>
-            <label>HymnBook:&nbsp;&nbsp;{{selectedBook}}</label>
-        </div>
-        <div class="dropdown dropdown-scroll">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A Hymn <span
-                    class="caret"></span>
+        <!--</div>-->
+        <!--<div class="dropdown dropdown-scroll">-->
+            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A Hymn
+                <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
                 <li role="presentation">
@@ -78,25 +50,27 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
                     <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName}} </a>
                 </li>
             </ul>
-            <label>Hymn:&nbsp;&nbsp;{{selectedHymn}}</label>
         </div>
-        <hr/>
-        <div class="hymn-whole">
+        <label>Selected Hymn Book:</label><p>{{selectedBook}}</p>
+        <label>Selected Hymn:</label><p>{{selectedHymn}}</p>
+        <div class="hymn-whole" ng-hide="!selectedHymn">
+            <hr/>
             <p class="hymn-title">{{hymn.title}}</p>
             <p class="hymn-body"><span>{{hymn.body}}</span></p>
         </div>
     </div>
     <div>
         <hr/>
-        <p>Please input ids of the hymns of each book and hit "Ok":</p>
+        <p class="instruction">Please input ids of selected hymns of each book and click "Submit":</p>
         <ul ng-repeat="bookName in bookNames">
-            {{bookName}}: <input type="text" ng-model="bookToHymnIds[bookName]" placeholder="Enter hymn ids here">
+            <label>{{bookName}}: </label>
+            <input type="text" size="50" maxlength="100" ng-model="bookToHymnIds[bookName]" placeholder="Enter hymn ids here (e.g: 2,1)">
         </ul>
-        <button ng-click="submitSelectedHymns()">Ok</button>
+        <button ng-click="submitSelectedHymns()" class="btn btn-default">Submit</button>
     </div>
     <div>
         <hr/>
-        <p>Please adjust the order of the selected hymns and hit "Go":</p>
+        <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics" and/or "Export To PPT":</p>
         <table>
             <tr ng-repeat="bookAndHymnId in bookAndHymnIds">
                 <td>{{hymnIdsToHymnNames[bookAndHymnId][0]}}&nbsp;&nbsp;{{hymnIdsToHymnNames[bookAndHymnId][1]}}&nbsp;&nbsp;</td>
@@ -111,7 +85,8 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
                 </td>
             </tr>
         </table>
-        <button ng-click="buildHymnResult()">Go</button>
+        <button ng-click="buildHymnResult()" class="btn btn-default">Show Lyrics</button>
+        <button ng-click="buildPowerPoint()" class="btn btn-default">Export To PPT</button>
     </div>
 </div>
 <div>
@@ -126,6 +101,9 @@ Hide the search tool: <input type="checkbox" ng-model="hideTheSearchTool">
 <script>
     $('.dropdown-menu').find('input').click(function (e) {
       e.stopPropagation();
+    });
+    $(document).ready(function(){
+        $('#bookName').combobox();
     });
 
 </script>
