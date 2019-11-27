@@ -2,6 +2,9 @@ var app = angular.module('HymnApp', []);
 
 app.controller('HymnCtrl', function($scope, $window, $http) {
   $scope.hideTheSearchTool=false
+  $scope.hideLyrics = true
+  document.getElementById("defaultOpen").click();
+
   $http.get("/bookNames")
   .then(function(response) {
       $scope.bookNames = response.data;
@@ -35,6 +38,9 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
       });
     }
   });
+  $scope.$watch('showLyricsOnly', function () {
+    $scope.hideTheSearchTool = $scope.showLyricsOnly;
+  })
 
   $scope.bookAndHymnIds = []
   var mapHymnIdsToHymnNames = function (hymnIdList) {
@@ -138,6 +144,7 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
         $scope.hymnResults[key] = response.data;
       });
     })
+    $scope.hideLyrics = false;
   }
 
   $scope.buildPowerPoint = function() {
@@ -158,3 +165,17 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     });
   }
 });
+
+function openTab(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}

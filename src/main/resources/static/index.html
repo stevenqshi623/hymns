@@ -17,91 +17,115 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body ng-app="HymnApp" ng-controller="HymnCtrl">
-<div>
-    <div>
-        <div class="dropdown dropdown-scroll">
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A HymnBook
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                <li role="presentation">
-                    <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
-                            class="glyphicon glyphicon-search"></span></span>
-                        <input type="text" class="form-control" placeholder="Query" ng-model="queryBook">
-                    </div>
-                </li>
-                <li role="presentation" ng-repeat='bookName in bookNames | filter:queryBook'>
-                    <a href="#" ng-click="selectBook(bookName);"> {{bookName}} </a>
-                </li>
-            </ul>
-        <!--</div>-->
-        <!--<div class="dropdown dropdown-scroll">-->
-            <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">Select A Hymn
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
-                <li role="presentation">
-                    <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
-                            class="glyphicon glyphicon-search"></span></span>
-                        <input type="text" class="form-control" placeholder="Query" ng-model="queryHymn">
-                    </div>
-                </li>
-                <li role="presentation" ng-repeat='hymnName in hymnNames | filter:queryHymn'>
-                    <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName}} </a>
-                </li>
-            </ul>
+<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'Home')" id="defaultOpen">Home</button>
+    <button class="tablinks" onclick="openTab(event, 'Setting')">Setting</button>
+    <button class="tablinks" onclick="openTab(event, 'Tools')">Tools</button>
+    <button class="tablinks" onclick="openTab(event, 'About')">About</button>
+</div>
+<div id="Home" class="tabcontent">
+    <div ng-hide="hideTheSearchTool">
+        <div>
+            <p class="instruction">Please select a hymnbook and a hymn name:</p>
+            <div class="dropdown dropdown-scroll">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <input type="text" class="button-input" placeholder="Please Select A Hymnbook"
+                           ng-model="selectedBook">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation">
+                        <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
+                                class="glyphicon glyphicon-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Query" ng-model="queryBook">
+                        </div>
+                    </li>
+                    <li role="presentation" ng-repeat='bookName in bookNames | filter:queryBook'>
+                        <a href="#" ng-click="selectBook(bookName);"> {{bookName}} </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="dropdown dropdown-scroll">
+                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                    <input type="text" class="button-input" placeholder="Please Select A Hymn" ng-model="selectedHymn">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
+                    <li role="presentation">
+                        <div class="input-group input-group-sm search-control"><span class="input-group-addon"><span
+                                class="glyphicon glyphicon-search"></span></span>
+                            <input type="text" class="form-control" placeholder="Query" ng-model="queryHymn">
+                        </div>
+                    </li>
+                    <li role="presentation" ng-repeat='hymnName in hymnNames | filter:queryHymn'>
+                        <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName}} </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="hymn-whole" ng-hide="!selectedHymn">
+                <p class="hymn-title">{{hymn.title}}</p>
+                <p class="hymn-body"><span>{{hymn.body}}</span></p>
+            </div>
         </div>
-        <label>Selected Hymn Book:</label><p>{{selectedBook}}</p>
-        <label>Selected Hymn:</label><p>{{selectedHymn}}</p>
-        <div class="hymn-whole" ng-hide="!selectedHymn">
+        <div>
             <hr/>
-            <p class="hymn-title">{{hymn.title}}</p>
-            <p class="hymn-body"><span>{{hymn.body}}</span></p>
+            <p class="instruction">Please input ids of the selected hymns of each book and click "Submit":</p>
+            <ul ng-repeat="bookName in bookNames">
+                <label>{{bookName}}: </label>
+                <input type="text" size="50" maxlength="100" ng-model="bookToHymnIds[bookName]"
+                       placeholder="Enter hymn ids here (e.g: 2,1)">
+            </ul>
+            <button ng-click="submitSelectedHymns()" class="btn btn-default">Submit</button>
+        </div>
+        <div>
+            <hr/>
+            <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics" and/or "Export
+                To PPT":</p>
+            <table>
+                <tr ng-repeat="bookAndHymnId in bookAndHymnIds">
+                    <td>{{hymnIdsToHymnNames[bookAndHymnId][0]}}&nbsp;&nbsp;{{hymnIdsToHymnNames[bookAndHymnId][1]}}&nbsp;&nbsp;</td>
+                    <td>
+                        <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
+                    </td>
+                    <td>
+                        <button class="glyphicon glyphicon-arrow-down" ng-click="moveDown($index, $last)"></button>
+                    </td>
+                    <td>
+                        <button class="glyphicon glyphicon-remove" ng-click="removeSelectedHymn($index)"></button>
+                    </td>
+                </tr>
+            </table>
+            <br/>
+            <button ng-click="buildHymnResult()" class="btn btn-default">Show Lyrics</button>
+            <button ng-click="buildPowerPoint()" class="btn btn-default">Export To PPT</button>
         </div>
     </div>
-    <div>
-        <hr/>
-        <p class="instruction">Please input ids of selected hymns of each book and click "Submit":</p>
-        <ul ng-repeat="bookName in bookNames">
-            <label>{{bookName}}: </label>
-            <input type="text" size="50" maxlength="100" ng-model="bookToHymnIds[bookName]" placeholder="Enter hymn ids here (e.g: 2,1)">
+    <div ng-hide="hideLyrics">
+        <ul ng-repeat="bookAndHymnId in bookAndHymnIds">
+            <hr/>
+            <div class="hymn-whole">
+                <p class="hymn-title">{{hymnResults[bookAndHymnId].title}}</p>
+                <p class="hymn-body"><span>{{hymnResults[bookAndHymnId].body}}</span></p>
+            </div>
         </ul>
-        <button ng-click="submitSelectedHymns()" class="btn btn-default">Submit</button>
-    </div>
-    <div>
-        <hr/>
-        <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics" and/or "Export To PPT":</p>
-        <table>
-            <tr ng-repeat="bookAndHymnId in bookAndHymnIds">
-                <td>{{hymnIdsToHymnNames[bookAndHymnId][0]}}&nbsp;&nbsp;{{hymnIdsToHymnNames[bookAndHymnId][1]}}&nbsp;&nbsp;</td>
-                <td>
-                    <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
-                </td>
-                <td>
-                    <button class="glyphicon glyphicon-arrow-down" ng-click="moveDown($index, $last)"></button>
-                </td>
-                <td>
-                    <button class="glyphicon glyphicon-remove" ng-click="removeSelectedHymn($index)"></button>
-                </td>
-            </tr>
-        </table>
-        <button ng-click="buildHymnResult()" class="btn btn-default">Show Lyrics</button>
-        <button ng-click="buildPowerPoint()" class="btn btn-default">Export To PPT</button>
     </div>
 </div>
-<div>
-    <ul ng-repeat="bookAndHymnId in bookAndHymnIds">
-        <hr/>
-        <div class="hymn-whole">
-            <p class="hymn-title">{{hymnResults[bookAndHymnId].title}}</p>
-            <p class="hymn-body"><span>{{hymnResults[bookAndHymnId].body}}</span></p>
-        </div>
-    </ul>
+<div id="Setting" class="tabcontent">
+    <input type="checkbox" ng-model="showLyricsOnly">Show lyrics only<br>
+</div>
+<div id="Tools" class="tabcontent">
+    <div>
+        <p>Want to add a hymn to the repo? Thanks a lot! The feature will be added soon.</p>
+    </div>
+</div>
+<div id="About" class="tabcontent">
+
 </div>
 <script>
     $('.dropdown-menu').find('input').click(function (e) {
       e.stopPropagation();
     });
+
 
 </script>
 </body>
