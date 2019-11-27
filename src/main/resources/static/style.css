@@ -1,19 +1,17 @@
 .dropdown.dropdown-scroll .dropdown-menu {
     max-height: 200px;
     width: 60px;
+    min-width: 250px;
     overflow: auto;
 }
 
 .select-button {
-    width: 200px;
+    width: 250px;
 }
 
 .float-div {
     float: left;
-}
-
-.btn-default {
-    margin-left: 35px;
+    margin-right: 4px;
 }
 
 .section {
