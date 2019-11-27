@@ -27,10 +27,9 @@
     <div ng-hide="hideTheSearchTool">
         <div>
             <p class="instruction">Please select a hymnbook and a hymn name:</p>
-            <div class="dropdown dropdown-scroll">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                    <input type="text" class="button-input" placeholder="Please Select A Hymnbook"
-                           ng-model="selectedBook">
+            <div class="dropdown dropdown-scroll float-div">
+                <button class="btn btn-default dropdown-toggle select-button" type="button" data-toggle="dropdown">
+                    {{selectedBookOrDefault}}
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -45,9 +44,9 @@
                     </li>
                 </ul>
             </div>
-            <div class="dropdown dropdown-scroll">
-                <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
-                    <input type="text" class="button-input" placeholder="Please Select A Hymn" ng-model="selectedHymn">
+            <div class="dropdown dropdown-scroll float-div">
+                <button class="btn btn-default dropdown-toggle select-button" type="button" data-toggle="dropdown">
+                    {{selectedHymnOrDefault}}
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -62,13 +61,14 @@
                     </li>
                 </ul>
             </div>
+            <br/><br/>
             <div class="hymn-whole" ng-hide="!selectedHymn">
                 <p class="hymn-title">{{hymn.title}}</p>
                 <p class="hymn-body"><span>{{hymn.body}}</span></p>
             </div>
-        </div>
-        <div>
             <hr/>
+        </div>
+        <div class="section">
             <p class="instruction">Please input ids of the selected hymns of each book and click "Submit":</p>
             <ul ng-repeat="bookName in bookNames">
                 <label>{{bookName}}: </label>
@@ -76,9 +76,9 @@
                        placeholder="Enter hymn ids here (e.g: 2,1)">
             </ul>
             <button ng-click="submitSelectedHymns()" class="btn btn-default">Submit</button>
+            <hr/>
         </div>
         <div>
-            <hr/>
             <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics" and/or "Export
                 To PPT":</p>
             <table>
@@ -98,15 +98,16 @@
             <br/>
             <button ng-click="buildHymnResult()" class="btn btn-default">Show Lyrics</button>
             <button ng-click="buildPowerPoint()" class="btn btn-default">Export To PPT</button>
+            <hr/>
         </div>
     </div>
     <div ng-hide="hideLyrics">
         <ul ng-repeat="bookAndHymnId in bookAndHymnIds">
-            <hr/>
             <div class="hymn-whole">
                 <p class="hymn-title">{{hymnResults[bookAndHymnId].title}}</p>
                 <p class="hymn-body"><span>{{hymnResults[bookAndHymnId].body}}</span></p>
             </div>
+            <hr/>
         </ul>
     </div>
 </div>
@@ -119,7 +120,6 @@
     </div>
 </div>
 <div id="About" class="tabcontent">
-
 </div>
 <script>
     $('.dropdown-menu').find('input').click(function (e) {

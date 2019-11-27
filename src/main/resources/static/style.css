@@ -3,11 +3,29 @@
     width: 60px;
     overflow: auto;
 }
+
+.select-button {
+    width: 200px;
+}
+
+.float-div {
+    float: left;
+}
+
+.btn-default {
+    margin-left: 35px;
+}
+
+.section {
+    clear:both
+}
+
 .search-control {
     padding: 5px 10px;
 }
 .hymn-whole {
     text-align: center;
+    clear: both;
 }
 .hymn-title {
     font-style: Sans-serif;
@@ -29,19 +47,6 @@ label {
     font-style: Sans-serif;
     font-size: 15px;
     font-weight: bold;
-}
-
-.button-input {
-    border-style: none;
-    box-sizing: border-box;
-}
-
-.btn-default:hover .button-input{
-    background-color:#e7e7e7
-}
-
-.dropdown-menu:hover .button-input{
-    background-color:#e7e7e7
 }
 
 /* Style the tab */

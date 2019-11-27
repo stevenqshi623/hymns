@@ -3,6 +3,10 @@ var app = angular.module('HymnApp', []);
 app.controller('HymnCtrl', function($scope, $window, $http) {
   $scope.hideTheSearchTool=false
   $scope.hideLyrics = true
+  let bookDefault = "Please Select A Book"
+  let hymnDefault = "Please Select A Hymn"
+  $scope.selectedBookOrDefault = bookDefault
+  $scope.selectedHymnOrDefault = hymnDefault
   document.getElementById("defaultOpen").click();
 
   $http.get("/bookNames")
@@ -12,6 +16,7 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
   $scope.bookToHymnIds = {};
   $scope.$watch('selectedBook', function () {
     if ($scope.selectedBook) {
+      $scope.selectedBookOrDefault = $scope.selectedBook;
       var req = {
           method: 'GET',
           url: '/hymnNames',
@@ -24,9 +29,13 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
         $scope.error = response.statusText;
       });
     }
+    else {
+      $scope.selectedBookOrDefault = bookDefault;
+    }
   });
   $scope.$watch('selectedHymn', function () {
     if ($scope.selectedHymn) {
+      $scope.selectedHymnOrDefault = $scope.selectedHymn;
       var req = {
         method: 'GET',
         url: '/hymn',
@@ -36,6 +45,9 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
       .then(function(response) {
         $scope.hymn = response.data;
       });
+    }
+    else {
+      $scope.selectedHymnOrDefault = hymnDefault;
     }
   });
   $scope.$watch('showLyricsOnly', function () {
