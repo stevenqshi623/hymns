@@ -123,8 +123,9 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
   $scope.removeSelectedHymn = function(index) {
     let deletedHymn = $scope.bookAndHymnIds[index]
     // remove the hymn from bookToHymnIds map
-    let bookName = deletedHymn[0]
-    let id = deletedHymn[1].split(' ')[0]
+    let nameAndId = deletedHymn.split('$')
+    let bookName = nameAndId[0]
+    let id = nameAndId[1]
     let idsString = $scope.bookToHymnIds[bookName]
     let ids = idsString.split(',')
     ids.splice(ids.indexOf(id), 1)
