@@ -1,18 +1,23 @@
 var app = angular.module('HymnApp', []);
 
 app.controller('HymnCtrl', function($scope, $window, $http) {
+  document.getElementById("defaultOpen").click();
+
   $scope.hideLyrics = true
+
   let bookDefault = "Please Select A Book"
   let hymnDefault = "Please Select A Hymn"
   $scope.selectedBookOrDefault = bookDefault
   $scope.selectedHymnOrDefault = hymnDefault
-  document.getElementById("defaultOpen").click();
+
+  $scope.bookToHymnIds = {};
+  $scope.bookAndHymnIds = []
 
   $http.get("/bookNames")
   .then(function(response) {
       $scope.bookNames = response.data;
   });
-  $scope.bookToHymnIds = {};
+
   $scope.$watch('selectedBook', function () {
     if ($scope.selectedBook) {
       $scope.selectedBookOrDefault = $scope.selectedBook;
@@ -32,6 +37,7 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
       $scope.selectedBookOrDefault = bookDefault;
     }
   });
+
   $scope.$watch('selectedHymn', function () {
     if ($scope.selectedHymn) {
       $scope.selectedHymnOrDefault = $scope.selectedHymn;
@@ -50,7 +56,6 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     }
   });
 
-  $scope.bookAndHymnIds = []
   var mapHymnIdsToHymnNames = function (hymnIdList) {
     $scope.hymnIdsToHymnNames = {}
     angular.forEach($scope.bookAndHymnIds, function(value){
@@ -75,13 +80,19 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     let newList = []
     angular.forEach($scope.bookToHymnIds, function(value, key) {
       $scope.bookToHymnIds[key] = value.replace(' ', '')
-      let ids = value.split(',')
-      angular.forEach(ids, function(id){
-        id = Number(id).toString()
-        if (id) {
-          newList.push(key+'$'+id)
+      if (value.length > 0) {
+        let ids = value.split(',')
+        if (ids.length > 0) {
+          angular.forEach(ids, function(id){
+            if (id.length > 0) {
+              id = Number(id).toString()
+              if (id > 0) {
+                newList.push(key+'$'+id)
+              }
+            }
+          })
         }
-      })
+      }
     })
     angular.forEach($scope.bookAndHymnIds, function(value) {
       if (newList.indexOf(value) == -1) {
