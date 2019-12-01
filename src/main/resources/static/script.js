@@ -1,146 +1,29 @@
 var app = angular.module('HymnApp', []);
 
+app.filter('myFormat', function() {
+  return function(x) {
+    return x.replace(/\$/g, ' ');
+  };
+});
+
 app.controller('HymnCtrl', function($scope, $window, $http) {
   document.getElementById("defaultOpen").click();
-
-  $scope.hideLyrics = true
-
   let bookDefault = "Please Select A Book"
   let hymnDefault = "Please Select A Hymn"
+
+  $scope.hideLyrics = true
   $scope.selectedBookOrDefault = bookDefault
   $scope.selectedHymnOrDefault = hymnDefault
 
-  $scope.bookToHymnIds = {};
-  $scope.bookAndHymnIds = []
-
-  $http.get("/bookNames")
+  $scope.bookNameToAllHymns = {}
+  $scope.bookNames = []
+  $http.get("/getBookNameToAllHymns")
   .then(function(response) {
-      $scope.bookNames = response.data;
+      $scope.bookNameToAllHymns = response.data;
+      angular.forEach($scope.bookNameToAllHymns, function(value, key) {
+        $scope.bookNames.push(key) 
+      })
   });
-
-  $scope.$watch('selectedBook', function () {
-    if ($scope.selectedBook) {
-      $scope.selectedBookOrDefault = $scope.selectedBook;
-      var req = {
-          method: 'GET',
-          url: '/hymnNames',
-          params: {bookName: $scope.selectedBook}
-      }
-      $http(req)
-      .then(function(response) {
-            $scope.hymnNames = response.data;
-      }, function(response) {
-        $scope.error = response.statusText;
-      });
-    }
-    else {
-      $scope.selectedBookOrDefault = bookDefault;
-    }
-  });
-
-  $scope.$watch('selectedHymn', function () {
-    if ($scope.selectedHymn) {
-      $scope.selectedHymnOrDefault = $scope.selectedHymn;
-      var req = {
-        method: 'GET',
-        url: '/hymn',
-        params: {bookName: $scope.selectedBook, hymnName: $scope.selectedHymn}
-      }
-      $http(req)
-      .then(function(response) {
-        $scope.hymn = response.data;
-      });
-    }
-    else {
-      $scope.selectedHymnOrDefault = hymnDefault;
-    }
-  });
-
-  var mapHymnIdsToHymnNames = function (hymnIdList) {
-    $scope.hymnIdsToHymnNames = {}
-    angular.forEach($scope.bookAndHymnIds, function(value){
-      let nameAndId = value.split('$')
-      let bookName = nameAndId[0]
-      let id = nameAndId[1]
-      let req = {
-        method: 'GET',
-        url: '/bookNameAndHymnIdToName',
-        params: {bookName: bookName, hymnId: id}
-      }
-      $http(req)
-      .then(function(response) {
-        $scope.hymnIdsToHymnNames[value] = [bookName, response.data[0]];
-      }, function(response) {
-        $scope.error = response.statusText;
-      });
-    })
-  }
-
-  $scope.submitSelectedHymns = function() {
-    let newList = []
-    angular.forEach($scope.bookToHymnIds, function(value, key) {
-      $scope.bookToHymnIds[key] = value.replace(' ', '')
-      if (value.length > 0) {
-        let ids = value.split(',')
-        if (ids.length > 0) {
-          angular.forEach(ids, function(id){
-            if (id.length > 0) {
-              id = Number(id).toString()
-              if (id > 0) {
-                newList.push(key+'$'+id)
-              }
-            }
-          })
-        }
-      }
-    })
-    angular.forEach($scope.bookAndHymnIds, function(value) {
-      if (newList.indexOf(value) == -1) {
-        $scope.bookAndHymnIds.splice($scope.bookAndHymnIds.indexOf(value), 1)
-      }
-    })
-    angular.forEach(newList, function(value) {
-      if ($scope.bookAndHymnIds.indexOf(value) == -1) {
-        $scope.bookAndHymnIds.push(value)
-      }
-    })
-    mapHymnIdsToHymnNames()
-  }
-
-  var move = function (origin, destination) {
-    let temp = $scope.bookAndHymnIds[destination];
-    $scope.bookAndHymnIds[destination] = $scope.bookAndHymnIds[origin];
-    $scope.bookAndHymnIds[origin] = temp;
-  };
-
-  $scope.moveUp = function (index, first) {
-    if (!first) {
-        move(index, index - 1);
-        mapHymnIdsToHymnNames()
-    }
-  };
-
-  $scope.moveDown = function (index, last) {
-    if (!last) {
-      move(index, index + 1);
-      mapHymnIdsToHymnNames()
-    }
-  };
-
-  $scope.removeSelectedHymn = function(index) {
-    let deletedHymn = $scope.bookAndHymnIds[index]
-    // remove the hymn from bookToHymnIds map
-    let nameAndId = deletedHymn.split('$')
-    let bookName = nameAndId[0]
-    let id = nameAndId[1]
-    let idsString = $scope.bookToHymnIds[bookName]
-    let ids = idsString.split(',')
-    ids.splice(ids.indexOf(id), 1)
-    $scope.bookToHymnIds[bookName] = ids.join(',')
-    // remove the hymn from bookAndHymnIds
-    $scope.bookAndHymnIds.splice(index, 1)
-    mapHymnIdsToHymnNames()
-  }
 
   $scope.selectBook = function(bookName) {
     $scope.selectedBook = bookName;
@@ -150,45 +33,160 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     $scope.selectedHymn = hymnName;
   }
 
-  $scope.buildHymnResult = function() {
-    $scope.hymnResults = {}
-    angular.forEach($scope.hymnIdsToHymnNames, function(value, key){
+  $scope.hymnNames = [];
+  $scope.$watch('selectedBook', function () {
+    if ($scope.selectedBook) {
+      $scope.selectedBookOrDefault = $scope.selectedBook;
+      $scope.hymnNames = $scope.bookNameToAllHymns[$scope.selectedBook];
+    }
+    else {
+      $scope.selectedBookOrDefault = bookDefault;
+    }
+  });
+
+  $scope.selectedHymnLyric = "";
+  $scope.$watch('selectedHymn', function () {
+    if ($scope.selectedHymn) {
+      $scope.selectedHymnOrDefault = $scope.selectedHymn;
       var req = {
         method: 'GET',
-        url: '/hymn',
-        params: {bookName: value[0], hymnName: value[1]}
-      }
+        url: '/getLyrics',
+        params: {bookNameAndHymnNames: [$scope.selectedBook + '$' + $scope.selectedHymn], includeChineseVersion: [true], includeEnglishVersion: [true]},
+      };
       $http(req)
       .then(function(response) {
-        $scope.hymnResults[key] = response.data;
+        $scope.selectedHymnLyric = response.data[0];
       });
+    }
+    else {
+      $scope.selectedHymnOrDefault = hymnDefault;
+    }
+  });
+
+  $scope.bookToSelectedHymnIds = {};
+  $scope.bookAndSelectedHymnList = [];
+  $scope.includeChineseLyrics = {};
+  $scope.includeEnglishLyrics = {};
+
+  $scope.submitSelectedHymns = function() {
+    let newList = [];
+    let error = "";
+    angular.forEach($scope.bookToSelectedHymnIds, function(value, bookName) {
+      $scope.bookToSelectedHymnIds[bookName] = value.replace(' ', '');
+      if (value.length > 0) {
+        let ids = value.split(',');
+        if (ids.length > 0) {
+          angular.forEach(ids, function(id){
+            if (id.length > 0 && Number(id) > 0) {
+              id = Number(id).toString();
+              let hymnNames = $scope.bookNameToAllHymns[bookName];
+              let findHymn = false;
+              angular.forEach(hymnNames, function(hymnName) {
+                if (hymnName.startsWith(id + '$')) {
+                  newList.push(bookName + '$' + hymnName);
+                  findHymn = true;
+                }
+              });
+              if (!findHymn) {
+                error += bookName + ": ";
+                error += id + "\n";
+              }
+            }
+          })
+        }
+      }
     })
-    $scope.hideLyrics = false;
+
+    if (error.length > 0) {
+      $window.alert("The following hymns are not available yet. So, they are ignored.\n\n" + error);
+    }
+
+    angular.forEach($scope.bookAndSelectedHymnList, function(value) {
+      if (newList.indexOf(value) == -1) {
+        $scope.bookAndSelectedHymnList.splice($scope.bookAndSelectedHymnList.indexOf(value), 1);
+        delete $scope.includeChineseLyrics[value];
+        delete $scope.includeEnglishLyrics[value];
+      }
+    })
+    angular.forEach(newList, function(value) {
+      if ($scope.bookAndSelectedHymnList.indexOf(value) == -1) {
+        $scope.bookAndSelectedHymnList.push(value)
+        $scope.includeChineseLyrics[value] = true;
+        $scope.includeEnglishLyrics[value] = true;
+      }
+    })
   }
 
-  $scope.buildPowerPoint = function() {
+  var move = function (origin, destination) {
+    let temp = $scope.bookAndSelectedHymnList[destination];
+    $scope.bookAndSelectedHymnList[destination] = $scope.bookAndSelectedHymnList[origin];
+    $scope.bookAndSelectedHymnList[origin] = temp;
+  };
+
+  $scope.moveUp = function (index, first) {
+    if (!first) {
+      move(index, index - 1);
+    }
+  };
+
+  $scope.moveDown = function (index, last) {
+    if (!last) {
+      move(index, index + 1);
+    }
+  };
+
+  $scope.removeSelectedHymn = function(index) {
+    let deletedHymn = $scope.bookAndSelectedHymnList[index]
+    // remove the hymn from bookToHymnIds map
+    let nameAndId = deletedHymn.split('$')
+    let bookName = nameAndId[0]
+    let id = nameAndId[1]
+    let idsString = $scope.bookToSelectedHymnIds[bookName]
+    let ids = idsString.split(',')
+    ids.splice(ids.indexOf(id), 1)
+    $scope.bookToSelectedHymnIds[bookName] = ids.join(',')
+    // remove the hymn from bookAndHymnIds
+    $scope.bookAndSelectedHymnList.splice(index, 1)
+    delete $scope.includeChineseLyrics[deletedHymn];
+    delete $scope.includeEnglishLyrics[deletedHymn];
+  }
+
+  $scope.selectedHymnLyrics = [];
+  $scope.showLyrics = function() {
+    $scope.selectedHymnLyrics = [];
+    let includeChineseLyricsList = [];
+    let includeEnglishLyricsList = [];
+    angular.forEach($scope.bookAndSelectedHymnList, function(bookAndSelectedHymn){
+      includeChineseLyricsList.push($scope.includeChineseLyrics[bookAndSelectedHymn]);
+      includeEnglishLyricsList.push($scope.includeEnglishLyrics[bookAndSelectedHymn]);
+    });
     var req = {
       method: 'GET',
-      url: '/getPowerPoint',
-      params: {bookAndHymnIds: $scope.bookAndHymnIds},
-      responseType: 'arraybuffer'
+      url: '/getLyrics',
+      params: {bookNameAndHymnNames: $scope.bookAndSelectedHymnList,
+        includeChineseVersion: includeChineseLyricsList,
+        includeEnglishVersion: includeEnglishLyricsList}
     }
     $http(req)
     .then(function(response) {
-      let blob = new Blob([response.data])
-      let a = document.createElement('a');
-      a.href = URL.createObjectURL(new Blob([response.data]));
-//      a.download = "Hymns-" + Date.now() +".pptx";
-      a.download = "Hymns.pptx";
-      a.click();
+      $scope.selectedHymnLyrics = response.data;
     });
+    $scope.hideLyrics = false;
   }
 
-  $scope.buildPresentation = function() {
+  $scope.showSlides = function() {
+    let includeChineseLyricsList = [];
+    let includeEnglishLyricsList = [];
+    angular.forEach($scope.bookAndSelectedHymnList, function(bookAndSelectedHymn){
+      includeChineseLyricsList.push($scope.includeChineseLyrics[bookAndSelectedHymn]);
+      includeEnglishLyricsList.push($scope.includeEnglishLyrics[bookAndSelectedHymn]);
+    });
     var req = {
       method: 'GET',
-      url: '/getPresentation',
-      params: {bookAndHymnIds: $scope.bookAndHymnIds},
+      url: '/showSlides',
+      params: {bookNameAndHymnNames: $scope.bookAndSelectedHymnList,
+              includeChineseVersion: includeChineseLyricsList,
+              includeEnglishVersion: includeEnglishLyricsList}
     }
     $http(req)
     .then(function(response) {
@@ -224,16 +222,38 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
         "	            height: '100%'," +
         "	            margin: 0," +
         "	            minScale: 1," +
-        "	            maxScale: 1," +
-        "				dependencies: [" +
-        "					{ src: 'reveal/plugin/markdown/marked.js' }," +
-        "					{ src: 'reveal/plugin/markdown/markdown.js' }" +
-        "				]" +
+        "	            maxScale: 1" +
         "			});" +
         "</script>" +
         "</body>" +
         "</html>"
       );
+    });
+  }
+
+  $scope.downloadSlides = function() {
+    let includeChineseLyricsList = [];
+    let includeEnglishLyricsList = [];
+    angular.forEach($scope.bookAndSelectedHymnList, function(bookAndSelectedHymn){
+      includeChineseLyricsList.push($scope.includeChineseLyrics[bookAndSelectedHymn]);
+      includeEnglishLyricsList.push($scope.includeEnglishLyrics[bookAndSelectedHymn]);
+    });
+    var req = {
+      method: 'GET',
+      url: '/downloadSlides',
+      params: {bookNameAndHymnNames: $scope.bookAndSelectedHymnList,
+        includeChineseVersion: includeChineseLyricsList,
+        includeEnglishVersion: includeEnglishLyricsList},
+      responseType: 'arraybuffer'
+    }
+    $http(req)
+    .then(function(response) {
+      let blob = new Blob([response.data])
+      let a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([response.data]));
+//      a.download = "Hymns-" + Date.now() +".pptx";
+      a.download = "Hymns.pptx";
+      a.click();
     });
   }
 });

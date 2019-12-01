@@ -1,12 +1,12 @@
 .dropdown.dropdown-scroll .dropdown-menu {
     max-height: 200px;
     width: 60px;
-    min-width: 250px;
+    min-width: 500px;
     overflow: auto;
 }
 
 .select-button {
-    width: 250px;
+    width: 500px;
 }
 
 .float-div {
@@ -22,18 +22,11 @@
     padding: 5px 10px;
 }
 .hymn-whole {
-    text-align: center;
     clear: both;
-}
-.hymn-title {
-    font-style: Sans-serif;
-    font-size: 40px;
-    font-weight: bold;
-}
-.hymn-body {
     font-style: Sans-serif;
     font-size: 30px;
     font-weight: bold;
+    text-align: center;
     white-space: pre-line;
 }
 
@@ -98,4 +91,12 @@ label {
 
 td {
     height: 36px;
+}
+table {
+    width: 100%;
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
 }

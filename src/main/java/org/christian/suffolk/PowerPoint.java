@@ -47,15 +47,18 @@ public class PowerPoint {
         paragraph.setBullet(false);
         paragraph.setIndent(0.0);
 
-        XSLFTextRun run = paragraph.addNewTextRun();
-        run.setText(titleText);
-        run.setFontSize(54.0);
-        run.setBold(true);
+        String[] lines = titleText.split("\\n");
+        for (String line : lines) {
+            XSLFTextRun run = paragraph.addNewTextRun();
+            run.setText(line);
+            run.setFontSize(54.0);
+            run.setBold(true);
+            paragraph.addLineBreak();
+        }
     }
 
-    public void insertBodyPages(String bodyText) {
-        String[] paragraphs = bodyText.split("\\n\\n");
-        for (String paragraphText : paragraphs) {
+    public void insertBodyPages(String[] texts, boolean twoVersions) {
+        for (int i = 1; i < texts.length; i += 2) {
             XSLFSlide slide = ppt.createSlide(titleAndContentLayout);
             slide.getPlaceholder(0).clearText();
 
@@ -68,15 +71,20 @@ public class PowerPoint {
             paragraph.setIndent(0.0);
             paragraph.setLineSpacing(126.0);
 
-            String[] lines = paragraphText.split("\\n");
-            for (String line : lines) {
-                XSLFTextRun run = paragraph.addNewTextRun();
-                run.setText(line);
-                run.setFontSize(36.0);
-                run.setBold(true);
-                paragraph.addLineBreak();
+            insertParagraphIntoMsSlides(texts[i], paragraph);
+            if (i + 1 < texts.length) {
+                if (twoVersions) {
+                    paragraph.addLineBreak();
+                }
+                insertParagraphIntoMsSlides(texts[i + 1], paragraph);
             }
         }
+    }
+
+    public byte[] getPowerPoint() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ppt.write(baos);
+        return baos.toByteArray();
     }
 
     public void outputPowerPoint() throws IOException {
@@ -85,9 +93,14 @@ public class PowerPoint {
         out.close();
     }
 
-    public byte[] getPowerPoint() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ppt.write(baos);
-        return baos.toByteArray();
+    private void insertParagraphIntoMsSlides(String text, XSLFTextParagraph paragraph) {
+        String[] lines = text.split("\\n");
+        for (String line : lines) {
+            XSLFTextRun run = paragraph.addNewTextRun();
+            run.setText(line);
+            run.setFontSize(36.0);
+            run.setBold(true);
+            paragraph.addLineBreak();
+        }
     }
 }

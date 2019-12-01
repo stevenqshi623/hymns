@@ -46,7 +46,7 @@
             </div>
             <div class="dropdown dropdown-scroll float-div">
                 <button class="btn btn-default dropdown-toggle select-button" type="button" data-toggle="dropdown">
-                    {{selectedHymnOrDefault}}
+                    {{selectedHymnOrDefault | myFormat}}
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">
@@ -57,14 +57,13 @@
                         </div>
                     </li>
                     <li role="presentation" ng-repeat='hymnName in hymnNames | filter:queryHymn'>
-                        <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName}} </a>
+                        <a href="#" ng-click="selectHymn(hymnName);"> {{hymnName | myFormat}} </a>
                     </li>
                 </ul>
             </div>
             <br/><br/>
             <div class="hymn-whole" ng-hide="!selectedHymn">
-                <p class="hymn-title">{{hymn.title}}</p>
-                <p class="hymn-body"><span>{{hymn.body}}</span></p>
+                <p> {{selectedHymnLyric}} </p>
             </div>
             <hr/>
         </div>
@@ -72,7 +71,7 @@
             <p class="instruction">Please input ids of the selected hymns of each book and click "Generate Hymn List".</p>
             <ul ng-repeat="bookName in bookNames">
                 <label>{{bookName}}: </label>
-                <input type="text" size="50" maxlength="100" ng-model="bookToHymnIds[bookName]"
+                <input type="text" size="100" maxlength="200" ng-model="bookToSelectedHymnIds[bookName]"
                        placeholder="Please enter hymn ids separated by commas (e.g: 1,2)">
             </ul>
             <button ng-click="submitSelectedHymns()" class="btn btn-default">Generate Hymn List</button>
@@ -81,8 +80,18 @@
         <div>
             <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics", "Show Slides", or "Export Slides".</p>
             <table>
-                <tr ng-repeat="bookAndHymnId in bookAndHymnIds">
-                    <td>{{hymnIdsToHymnNames[bookAndHymnId][0]}}&nbsp;&nbsp;{{hymnIdsToHymnNames[bookAndHymnId][1]}}&nbsp;&nbsp;</td>
+                <tr>
+                    <td>Hymn</td>
+                    <td>Display Chinese Lyrics</td>
+                    <td>Display English Lyrics</td>
+                    <td>Move Up</td>
+                    <td>Move Down</td>
+                    <td>Delete</td>
+                </tr>
+                <tr ng-repeat="bookAndSelectedHymn in bookAndSelectedHymnList">
+                    <td>{{bookAndSelectedHymn  | myFormat}}&nbsp;&nbsp;</td>
+                    <td><input type="checkbox" ng-model="includeChineseLyrics[bookAndSelectedHymn]"></td>
+                    <td><input type="checkbox" ng-model="includeEnglishLyrics[bookAndSelectedHymn]"></td>
                     <td>
                         <button class="glyphicon glyphicon-arrow-up" ng-click="moveUp($index, $first)"></button>
                     </td>
@@ -95,17 +104,16 @@
                 </tr>
             </table>
             <br/>
-            <button ng-click="buildHymnResult()" class="btn btn-default">Show Lyrics</button>
-            <button ng-click="buildPresentation()" class="btn btn-default">Show Slides</button>
-            <button ng-click="buildPowerPoint()" class="btn btn-default">Export Slides</button>
+            <button ng-click="showLyrics()" class="btn btn-default">Show Lyrics</button>
+            <button ng-click="showSlides()" class="btn btn-default">Show Slides</button>
+            <button ng-click="downloadSlides()" class="btn btn-default">Download Slides</button>
             <hr/>
         </div>
     </div>
     <div ng-hide="hideLyrics">
-        <ul ng-repeat="bookAndHymnId in bookAndHymnIds">
+        <ul ng-repeat="hymnLyric in selectedHymnLyrics">
             <div class="hymn-whole">
-                <p class="hymn-title">{{hymnResults[bookAndHymnId].title}}</p>
-                <p class="hymn-body"><span>{{hymnResults[bookAndHymnId].body}}</span></p>
+                <p> {{hymnLyric}} </p>
             </div>
             <hr/>
         </ul>
