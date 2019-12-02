@@ -11,7 +11,6 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
   let bookDefault = "Please Select A Book"
   let hymnDefault = "Please Select A Hymn"
 
-  $scope.hideLyrics = true
   $scope.selectedBookOrDefault = bookDefault
   $scope.selectedHymnOrDefault = hymnDefault
 
@@ -34,9 +33,13 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
   }
 
   $scope.hymnNames = [];
+  $scope.selectedHymnLyric = false;
   $scope.$watch('selectedBook', function () {
     if ($scope.selectedBook) {
       $scope.selectedBookOrDefault = $scope.selectedBook;
+      $scope.selectedHymnOrDefault = hymnDefault;
+      $scope.selectedHymnLyric = false;
+      $scope.selectedHymn = false;
       $scope.hymnNames = $scope.bookNameToAllHymns[$scope.selectedBook];
     }
     else {
@@ -44,7 +47,6 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     }
   });
 
-  $scope.selectedHymnLyric = "";
   $scope.$watch('selectedHymn', function () {
     if ($scope.selectedHymn) {
       $scope.selectedHymnOrDefault = $scope.selectedHymn;
@@ -171,7 +173,6 @@ app.controller('HymnCtrl', function($scope, $window, $http) {
     .then(function(response) {
       $scope.selectedHymnLyrics = response.data;
     });
-    $scope.hideLyrics = false;
   }
 
   $scope.showSlides = function() {

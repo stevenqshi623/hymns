@@ -19,14 +19,13 @@
 <body ng-app="HymnApp" ng-controller="HymnCtrl">
 <div class="tab">
     <button class="tablinks" onclick="openTab(event, 'Home')" id="defaultOpen">Home</button>
-    <!--<button class="tablinks" onclick="openTab(event, 'Setting')">Setting</button>-->
-    <!--<button class="tablinks" onclick="openTab(event, 'Tools')">Tools</button>-->
     <button class="tablinks" onclick="openTab(event, 'About')">About</button>
 </div>
 <div id="Home" class="tabcontent">
     <div>
         <div>
-            <p class="instruction">Please select a hymnbook and a hymn to check its lyric.</p>
+            <p class="instruction">查看歌词，请选择诗歌本和诗歌</p>
+            <p class="instruction">Please select a hymnbook and a hymn to check its lyric</p>
             <div class="dropdown dropdown-scroll float-div">
                 <button class="btn btn-default dropdown-toggle select-button" type="button" data-toggle="dropdown">
                     {{selectedBookOrDefault}}
@@ -62,13 +61,14 @@
                 </ul>
             </div>
             <br/><br/>
-            <div class="hymn-whole" ng-hide="!selectedHymn">
+            <div class="hymn-whole" ng-hide="!selectedHymnLyric">
                 <p> {{selectedHymnLyric}} </p>
             </div>
             <hr/>
         </div>
         <div class="section">
-            <p class="instruction">Please input ids of the selected hymns of each book and click "Generate Hymn List".</p>
+            <p class="instruction">请在各个诗歌本对应的输入框里输入选择的诗歌序号，然后点击 "Generate Hymn List"</p>
+            <p class="instruction">Please input ids of the selected hymns of each book and click "Generate Hymn List"</p>
             <ul ng-repeat="bookName in bookNames">
                 <label>{{bookName}}: </label>
                 <input type="text" size="100" maxlength="200" ng-model="bookToSelectedHymnIds[bookName]"
@@ -78,7 +78,8 @@
             <hr/>
         </div>
         <div>
-            <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics", "Show Slides", or "Export Slides".</p>
+            <p class="instruction">请调整诗歌顺序，并选择是否显示中文及英文，然后点击 "Show Lyrics"、 "Show Slides"、 "Export Slides"</p>
+            <p class="instruction">Please adjust the order of the selected hymns and click "Show Lyrics", "Show Slides", or "Export Slides"</p>
             <table>
                 <tr>
                     <td>Hymn</td>
@@ -110,7 +111,7 @@
             <hr/>
         </div>
     </div>
-    <div ng-hide="hideLyrics">
+    <div>
         <ul ng-repeat="hymnLyric in selectedHymnLyrics">
             <div class="hymn-whole">
                 <p> {{hymnLyric}} </p>
@@ -119,23 +120,12 @@
         </ul>
     </div>
 </div>
-<!--<div id="Setting" class="tabcontent">-->
-    <!--<input type="checkbox" ng-model="showLyricsOnly">Show lyrics only<br>-->
-<!--</div>-->
-<!--<div id="Tools" class="tabcontent">-->
-    <!--<div>-->
-        <!--<p>Want to add a hymn to the repo? Thanks a lot! The feature will be added soon.</p>-->
-    <!--</div>-->
-<!--</div>-->
 <div id="About" class="tabcontent">
 </div>
 <script>
     $('.dropdown-menu').find('input').click(function (e) {
       e.stopPropagation();
     });
-
-
-
 
 </script>
 </body>
