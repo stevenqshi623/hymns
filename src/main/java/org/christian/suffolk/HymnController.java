@@ -1,6 +1,8 @@
 package org.christian.suffolk;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,8 +17,8 @@ import java.util.jar.JarFile;
 
 @RestController
 public class HymnController {
-    private final String hymnLibraryName = "HymnLibrary";
-    private final ClassLoader classLoader = getClass().getClassLoader();
+    @Value("${hymn.library.path}")
+    private String hymnLibraryPath;
 
     private class LyricData {
         String lyric;
@@ -41,52 +43,26 @@ public class HymnController {
             return hasEnglishVersion;
         }
     }
+
     @RequestMapping("/getBookNameToAllHymns")
     public Map<String,Set<String>> getBookNameToAllHymns() throws IOException, URISyntaxException {
-        URL libraryURL = classLoader.getResource(hymnLibraryName);
+        File hymnLibraryDir = new File(hymnLibraryPath);
         Map<String, Set<String>> results = new TreeMap<>();
-        if ("file".equals(libraryURL.getProtocol())) {
-            List<String> bookNames = Arrays.asList(new File(libraryURL.toURI()).list());
+        String[] bookNames = hymnLibraryDir.list();
+        if (bookNames != null) {
             for (String bookName : bookNames) {
-                String hymnBookPath = hymnLibraryName + "/" + bookName;
-                URL hymnBookURL = classLoader.getResource(hymnBookPath);
+                if (bookName.startsWith(".")) {
+                    continue;
+                }
+                String hymnBookPath = hymnLibraryPath + "/" + bookName;
+                File hymnBookDir = new File(hymnBookPath);
                 Set<String> treeSet = new TreeSet<>((s1, s2) -> {
                     int i1 = Integer.parseInt(s1.substring(0, s1.indexOf('$')));
                     int i2 = Integer.parseInt(s2.substring(0, s2.indexOf('$')));
                     return i1 - i2;
                 });
-                treeSet.addAll(Arrays.asList(new File(hymnBookURL.toURI()).list()));
+                treeSet.addAll(Arrays.asList(hymnBookDir.list()));
                 results.put(bookName, treeSet);
-            }
-        } else {
-            //strip out only the JAR file
-            String jarPath = libraryURL.getPath().substring(5, libraryURL.getPath().indexOf("!"));
-            JarFile jar = new JarFile(URLDecoder.decode(jarPath, "UTF-8"));
-            //gives ALL entries in jar
-            Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                String libraryBookHymnPath = entries.nextElement().getName();
-                if (libraryBookHymnPath.startsWith(hymnLibraryName + "/")) {
-                    String bookHymnPath = libraryBookHymnPath.substring(hymnLibraryName.length() + 1);
-                    int bookNameEndIndex = bookHymnPath.indexOf("/");
-                    if (bookNameEndIndex > 0) {
-                        // if it is a subdirectory, we just return the directory name
-                        String bookName = bookHymnPath.substring(0, bookNameEndIndex);
-                        if (!results.containsKey(bookName)) {
-                            results.put(bookName, new TreeSet<>((s1, s2) -> {
-                                int i1 = Integer.parseInt(s1.substring(0, s1.indexOf('$')));
-                                int i2 = Integer.parseInt(s2.substring(0, s2.indexOf('$')));
-                                return i1 - i2;
-                            }));
-                        }
-                        String hymnPath =  bookHymnPath.substring(bookNameEndIndex + 1);
-                        int hymnEndIndex = hymnPath.indexOf("/");
-                        if (hymnEndIndex > 0) {
-                            String hymnName = hymnPath.substring(0, hymnEndIndex);
-                            results.get(bookName).add(hymnName);
-                        }
-                    }
-                }
             }
         }
         return results;
@@ -153,10 +129,10 @@ public class HymnController {
         JSONObject chineseObj = null;
         JSONObject englishObj = null;
         if (includeChineseVersion && !hymnInfo[1].isEmpty()) {
-            chineseObj = readLyric(hymnLibraryName + "/" + bookName + "/" + hymnName + "/Chinese.json");
+            chineseObj = readLyric(hymnLibraryPath + "/" + bookName + "/" + hymnName + "/Chinese.json");
         }
         if (includeEnglishVersion && hymnInfo.length == 3 && !hymnInfo[2].isEmpty()) {
-            englishObj = readLyric(hymnLibraryName + "/" + bookName + "/" + hymnName + "/English.json");
+            englishObj = readLyric(hymnLibraryPath + "/" + bookName + "/" + hymnName + "/English.json");
         }
         return merge(chineseObj, englishObj);
     }
@@ -185,7 +161,7 @@ public class HymnController {
     }
 
     private JSONObject readLyric(String path) throws IOException {
-        InputStream in = classLoader.getResourceAsStream(path);
+        InputStream in = new FileInputStream(path);
         BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         String line;
         StringBuilder sb = new StringBuilder();
